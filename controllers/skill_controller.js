@@ -20,7 +20,7 @@ const createSkill = catchAsync(async (req, res) => {
         message: "Skill created successfully",
         status: 'success',
         data: {
-            newSkill
+            newSkill,
         }
     });
 });
