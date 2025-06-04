@@ -30,3 +30,5 @@ const createSocial = catchAsync(async (req, res) => {
 
 });
 
+export { createSocial };
+
