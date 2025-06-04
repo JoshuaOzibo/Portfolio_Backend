@@ -7,8 +7,9 @@ import morgan from 'morgan';
 import authRouter from './route/auth_Router.js';
 import projectRoute from './route/project_Router.js';
 import connectDb from './DataBase/mongo_db.js';
-import { errorHandler, notFound, ApiError, catchAsync } from './middleware/errorHandler.js';
+import { errorHandler, notFound} from './middleware/errorHandler.js';
 import skillRoute from './route/skill_Route.js';
+import socialRoute from './route/social_Router.js';
 
 const app = express();
 
@@ -25,7 +26,7 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/projects', projectRoute);
 app.use('/api/v1/skills', skillRoute);
-
+app.use('/api/v1/socials', socialRoute);
 // Handle undefined routes
 app.use(notFound);
 
