@@ -14,3 +14,5 @@ const socialSchema = new mongoose.Schema({
 }, {timestamps: true});
 
 const social = mongoose.model("social", socialSchema);
+
+export default social;
