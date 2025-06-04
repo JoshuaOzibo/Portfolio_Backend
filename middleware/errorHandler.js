@@ -50,7 +50,7 @@ const sendErrorProd = (err, res) => {
             message: err.message
         });
     } 
-    // Programming or other unknown error: don't leak error details
+   
     else {
         // Log error for debugging
         console.error('ERROR 💥', err);
@@ -97,9 +97,16 @@ const notFound = (req, res, next) => {
     next(error);
 };
 
+// Already Found error handler
+const alreadyExists = (req, res, next) => {
+    const error = new ApiError(404, `Already Exists - ${req.originalUrl}`);
+    next(error);
+};
+
 export { 
     errorHandler, 
     catchAsync, 
     notFound, 
-    ApiError 
+    ApiError,
+    alreadyExists
 }; 
