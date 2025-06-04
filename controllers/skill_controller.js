@@ -1,15 +1,13 @@
 import skill from "../models/skill_model.js";
-
+import { catchAsync } from "../middleware/errorHandler.js";
 
 // create skill
-const createSkill = async (req, res) => {
+const createSkill = catchAsync(async (req, res) => {
   try {
     const { skillName, image } = req.body;
 
     if (!skillName || !image) {
-      return res
-        .status(400)
-        .json({ message: "Skill name and image are required" });
+      throw new ApiError(400, "Skill name and image are required");
     }
 
     const newSkill = new skill({ skillName, image });
@@ -19,14 +17,12 @@ const createSkill = async (req, res) => {
       .status(201)
       .json({ message: "Skill created successfully", skill: newSkill });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error creating skill", error: error.message });
+    throw new ApiError(500, "Error creating skill", error.message);
   }
-};
+});
 
 // get all skills
-const getAllSkills = async (req, res) => {
+const getAllSkills = catchAsync(async (req, res) => {
   if (!req.body.skillName || !req.body.image) {
     throw new ApiError(400, "Skill name and image are not found");
   }
@@ -35,14 +31,12 @@ const getAllSkills = async (req, res) => {
     const skills = await skill.find();
     res.status(200).json({ skills });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching skills", error: error.message });
+    throw new ApiError(500, "Error fetching skills", error.message);
   }
-};
+});
 
 // get skill by id
-const getSkillById = async (req, res) => {
+const getSkillById = catchAsync(async (req, res) => {
   try {
     if (!req.params.id) {
       throw new ApiError(400, "Skill id is not found");
@@ -52,14 +46,12 @@ const getSkillById = async (req, res) => {
     const skill = await skill.findById(id);
     res.status(200).json({ skill });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching skill", error: error.message });
+    throw new ApiError(500, "Error fetching skill", error.message);
   }
-};
+});
 
 // update skill
-const updateSkill = async (req, res) => {
+const updateSkill = catchAsync(async (req, res) => {
   try {
     if (!req.params.id) {
       throw new ApiError(400, "Skill id is not found");
@@ -67,23 +59,21 @@ const updateSkill = async (req, res) => {
 
     const { id } = req.params;
     const { skillName, image } = req.body;
-  const updatedSkill = await skill.findByIdAndUpdate(
-    id,
-    { skillName, image },
-    { new: true }
-  );
-  res
-    .status(200)
+    const updatedSkill = await skill.findByIdAndUpdate(
+      id,
+      { skillName, image },
+      { new: true }
+    );
+    res
+      .status(200)
       .json({ message: "Skill updated successfully", skill: updatedSkill });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error updating skill", error: error.message });
+    throw new ApiError(500, "Error updating skill", error.message);
   }
-};
+});
 
 // delete skill
-const deleteSkill = async (req, res) => {
+const deleteSkill = catchAsync(async (req, res) => {
   try {
     if (!req.params.id) {
       throw new ApiError(400, "Skill id is not found");
@@ -93,9 +83,8 @@ const deleteSkill = async (req, res) => {
     await skill.findByIdAndDelete(id);
     res.status(200).json({ message: "Skill deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting skill", error: error.message });
+    throw new ApiError(500, "Error deleting skill", error.message);
   }
-};
-
+});
 
 export { createSkill, getAllSkills, getSkillById, updateSkill, deleteSkill };

@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // Routes
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/projects', projectRoute);
-app.use('/api/v1/skills', catchAsync(skillRoute));
+app.use('/api/v1/skills', skillRoute);
 
 // Handle undefined routes
 app.use(notFound);
