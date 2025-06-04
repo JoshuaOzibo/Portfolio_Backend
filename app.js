@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 dotenv.config();
-
 import express from 'express'; 
 import cors from 'cors';
 import helmet from 'helmet';
@@ -9,6 +8,7 @@ import authRouter from './route/auth_Router.js';
 import projectRoute from './route/project_Router.js';
 import connectDb from './DataBase/mongo_db.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
+import skillRoute from './route/skill_Router.js';
 
 const app = express();
 
@@ -24,6 +24,7 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // Routes
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/projects', projectRoute);
+app.use('/api/v1/skills', skillRoute);
 
 // Handle undefined routes
 app.use(notFound);
