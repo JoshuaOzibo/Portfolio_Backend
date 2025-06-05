@@ -1,5 +1,5 @@
 import Social from "../models/social_model.js";
-import { catchAsync } from "../middleware/errorHandler.js";
+import { catchAsync, ApiError } from "../middleware/errorHandler.js";
 
 const createSocial = catchAsync(async (req, res) => {
   try {
