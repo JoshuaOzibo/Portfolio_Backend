@@ -1,5 +1,4 @@
-import catchAsync from "../utils/catchAsync.js";
-import ApiError from "../utils/ApiError.js";
+import { catchAsync, ApiError } from "../middleware/errorHandler.js";
 import Experience from "../models/experience_model.js";
 
 const createExperience = catchAsync(async (req, res) => {

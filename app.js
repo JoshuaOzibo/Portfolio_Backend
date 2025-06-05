@@ -10,7 +10,7 @@ import connectDb from './DataBase/mongo_db.js';
 import { errorHandler, notFound} from './middleware/errorHandler.js';
 import skillRoute from './route/skill_Route.js';
 import socialRoute from './route/social_Router.js';
-
+import experienceRoute from './route/experience_Route.js';
 const app = express();
 
 // Security Middleware
@@ -27,6 +27,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/projects', projectRoute);
 app.use('/api/v1/skills', skillRoute);
 app.use('/api/v1/socials', socialRoute);
+app.use('/api/v1/experiences', experienceRoute);
 // Handle undefined routes
 app.use(notFound);
 
