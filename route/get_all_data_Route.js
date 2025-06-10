@@ -1,5 +1,4 @@
 import { Router } from "express";
-import connectDb from "../DataBase/mongo_db.js";
 import mongoose from "mongoose";
 
 const route = Router();
@@ -7,7 +6,7 @@ const route = Router();
 route.get("/", async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
-      throw new Error('Mongobd not connected')
+      throw new Error("Mongobd not connected");
     }
 
     const collections = await mongoose.connection.db
