@@ -32,6 +32,19 @@ const projectSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
+
+    status: {
+        type: String,
+       
+        trim: true,
+        enum: ["Live", "In Progress", "Draft"]
+    },
+
+   featured: {
+        type: Boolean,
+    
+        trim: true
+    }
     
 }, {timestamps: true})
 

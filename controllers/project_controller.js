@@ -4,6 +4,7 @@ import { catchAsync, ApiError } from "../middleware/errorHandler.js";
 // Create a new project
 const createProject = catchAsync(async (req, res) => {
     const { title, description, skills, liveLink, githubLink, image } = req.body;
+    
 
     // Validate required fields
     if (!title || !description || !skills || !liveLink || !githubLink || !image) {
