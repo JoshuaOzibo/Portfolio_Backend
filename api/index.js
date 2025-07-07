@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
+const serverless = require("serverless-http");
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
