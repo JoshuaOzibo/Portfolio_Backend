@@ -1,95 +1,115 @@
-import mongoose from "mongoose";
 import User from "../models/user_model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { catchAsync, ApiError } from "../middleware/errorHandler.js";
 
-export const signUpController = async (req, res, next) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
+export const signUpController = catchAsync(async (req, res, next) => {
+  const { name, email, password } = req.body;
 
+  // 1. Basic validation
+  if (!name || !email || !password) {
+    throw new ApiError(400, 'Please provide name, email, and password.');
+  }
+
+  // 2. Email format check (optional but useful)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    throw new ApiError(400, 'Please provide a valid email address.');
+  }
+
+  // 3. Check if user already exists
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    throw new ApiError(409, 'User with this email already exists.');
+  }
+
+  // 4. Hash password
+  const salt = await bcrypt.genSalt(12);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  // 5. Create new user
+  const newUser = await User.create({
+    name,
+    email,
+    password: hashedPassword,
+  });
+
+  // 6. Generate token
+  const token = jwt.sign(
+    { userId: newUser._id, email: newUser.email },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN || '1d' }
+  );
+
+  // 7. Remove sensitive data from response
+  const { password: _, ...userData } = newUser.toObject();
+
+  // 8. Send response
+  res.status(201).json({
+    success: true,
+    message: 'User created successfully',
+    data: {
+      token,
+      user: userData,
+    },
+  });
+});
+
+
+export const signInController = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { email, password } = req.body;
 
-    const existingUser = await User.findOne({ email });
-
-    if (existingUser) {
-      const error = new Error("User already exist");
-      // error.status(409);
-      throw error;
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email and password are required.',
+      });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    // Check if user exists
+    const userFromDb = await User.findOne({ email });
+    if (!userFromDb) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not registered.',
+      });
+    }
 
-    const newUser = await User.create(
-      [{ name, email, password: hashedPassword }],
-      { session }
+    // Compare password
+    const isMatch = await bcrypt.compare(password, userFromDb.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid password.',
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: userFromDb._id, email: userFromDb.email },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '1d' }
     );
 
-    const token = jwt.sign({ userId: newUser[0]._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    });
-
-    await session.commitTransaction();
-    session.endSession();
-
-    res.status(201).json({
-      success: true,
-      message: "user created successfully",
-      data: {
-        token,
-        user: newUser,
-      },
-    });
-
-    // console.log(res)
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    next(error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred",
-      error: error.message || error.toString(),
-    });
-    
-  }
-};
-
-
-export const signInController = async(req, res, next) => {
-
-  try {
-    const {email, password} = req.body;
-
-    // compare email from the request and email from the db;
-    const userFromDb = await User.findOne({email});
-
-    // error if user dosent exist;
-    if(!userFromDb){
-      const error = new Error('User not registered');
-      throw error
+    // Remove sensitive fields before sending response
+    const userResponse = {
+      _id: userFromDb._id,
+      email: userFromDb.email,
+      name: userFromDb.name,
+      // Add any other public fields
     };
-
-    // compare password;
-    const comparePassword = await bcrypt.compare(password, userFromDb.password);
-
-    // error if password is wrong;
-    if(!comparePassword) new Error('invalid password');
-
-    // if everything is correct get token
-    const token = jwt.sign({userId: userFromDb._id}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRES_IN});
 
     res.status(200).json({
       success: true,
-      message:'user signed in',
+      message: 'User signed in successfully.',
       data: {
-        token, 
-        userFromDb
-      }
-    })
-    
+        token,
+        user: userResponse,
+      },
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
