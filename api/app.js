@@ -4,14 +4,14 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import authRouter from "./route/auth_Router.js";
-import projectRoute from "./route/project_Router.js";
-import connectDb from "./DataBase/mongo_db.js";
-import { errorHandler, notFound } from "./middleware/errorHandler.js";
-import skillRoute from "./route/skill_Route.js";
-import socialRoute from "./route/social_Router.js";
-import experienceRoute from "./route/experience_Route.js";
-import getAllDbData from "./route/get_all_data_Route.js";
+import authRouter from "../route/auth_Router.js";
+import projectRoute from "../route/project_Router.js";
+import connectDb from "../DataBase/mongo_db.js";
+import { errorHandler, notFound } from "../middleware/errorHandler.js";
+import skillRoute from "../route/skill_Route.js";
+import socialRoute from "../route/social_Router.js";
+import experienceRoute from "../route/experience_Route.js";
+import getAllDbData from "../route/get_all_data_Route.js";
 
 const app = express();
 
@@ -62,3 +62,5 @@ const startServer = async () => {
 };
 
 startServer();
+
+module.exports.handler = serverless(app);
