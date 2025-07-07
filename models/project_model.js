@@ -5,7 +5,7 @@ const projectSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        
+        index: true
     },
     description: {
         type: String,
@@ -16,6 +16,7 @@ const projectSchema = new mongoose.Schema({
         type: [String],
         required: true,
         trim: true,
+        index: true
     },
     liveLink: {
         type: String,
@@ -32,22 +33,30 @@ const projectSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-
+    imageSize: {
+        type: Number,
+        default: 0
+    },
     status: {
         type: String,
-       
         trim: true,
-        enum: ["Live", "In Progress", "Draft"]
+        enum: ["Live", "In Progress", "Draft"],
+        index: true
     },
-
-   featured: {
+    featured: {
         type: Boolean,
-    
-        trim: true
+        trim: true,
+        default: false,
+        index: true
     }
     
-}, {timestamps: true})
-
+}, {
+    timestamps: true,
+    indexes: [
+        { createdAt: -1 },
+        { status: 1, featured: 1 }
+    ]
+});
 
 const Project = mongoose.model('Project', projectSchema);
 

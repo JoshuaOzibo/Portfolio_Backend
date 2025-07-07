@@ -2,7 +2,11 @@ import mongoose from "mongoose";
 
 const experienceSchema = new mongoose.Schema(
   {
-    companyName: {
+      companyName: {
+        type: String,
+        required: true,
+        trim: true,
+      },
       position: {
         type: String,
         required: true,
@@ -23,6 +27,11 @@ const experienceSchema = new mongoose.Schema(
           trim: true,
         },
       ],
+      technologies: {
+        type: [String],
+        required: true,
+        trim: true,
+      },
 
       image: {
         type: String,
@@ -35,8 +44,14 @@ const experienceSchema = new mongoose.Schema(
         required: true,
         trim: true,
       },
+
+      
+      isCurrent: {
+        type: Boolean,
+        required: true,
+        trim: true,
+      }
     },
-  },
   { timestamp: true }
 );
 

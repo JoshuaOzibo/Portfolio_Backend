@@ -3,9 +3,26 @@ import Experience from "../models/experience_model.js";
 
 const createExperience = catchAsync(async (req, res) => {
   try {
-    const { title, description, image, liveLink } = req.body;
+    const { companyName,
+          position,
+          startDate,
+          endDate,
+          responsibility,
+          technologies,
+          image,
+          liveLink,
+          isCurrent } = req.body;
 
-    const experience = await Experience.create({ title, description, image, liveLink });
+    const experience = await Experience.create({ 
+          companyName,
+          position,
+          startDate,
+          endDate,
+          responsibility,
+          technologies,
+          image,
+          liveLink,
+          isCurrent });
     if (!experience) {
       throw new ApiError(404, "Experience not found");
     }

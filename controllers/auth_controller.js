@@ -41,6 +41,8 @@ export const signUpController = async (req, res, next) => {
         user: newUser,
       },
     });
+
+    // console.log(res)
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -82,7 +84,8 @@ export const signInController = async(req, res, next) => {
       success: true,
       message:'user signed in',
       data: {
-        token, userFromDb
+        token, 
+        userFromDb
       }
     })
     

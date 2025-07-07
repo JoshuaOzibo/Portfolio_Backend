@@ -37,6 +37,8 @@ app.use("/api/v1/skills", skillRoute);
 app.use("/api/v1/socials", socialRoute);
 app.use("/api/v1/experiences", experienceRoute);
 app.use("/api/v1/users", getAllDbData);
+
+
 // Handle undefined routes
 app.use(notFound);
 
