@@ -5,9 +5,10 @@ const serverless = require("serverless-http");
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import authRouter from "../route/auth_Router.js";
+// import authRouter from "../route/auth_Router.js";
 import projectRoute from "../route/project_Router.js";
-import connectDb from "../DataBase/mongo_db.js";
+import connectDb from "DataBase/mongo_db.js";
+import authRouter from "route/auth_Router.js";
 import { errorHandler, notFound } from "../middleware/errorHandler.js";
 import skillRoute from "../route/skill_Route.js";
 import socialRoute from "../route/social_Router.js";
@@ -49,19 +50,19 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 8000;
 
 // Start server after database connection
-const startServer = async () => {
-  try {
-    await connectDb();
+let isDbConnected = false;
 
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
+app.use(async (req, res, next) => {
+  if (!isDbConnected) {
+    try {
+      await connectDb();
+      isDbConnected = true;
+    } catch (err) {
+      console.error("MongoDB connection error:", err);
+      return res.status(500).json({ error: "Database connection failed" });
+    }
   }
-};
-
-startServer();
+  next();
+});
 
 module.exports.handler = serverless(app);
