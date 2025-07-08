@@ -1,7 +1,10 @@
 import User from "../models/user_model.js";
+import { OAuth2Client } from "google-auth-library";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { catchAsync, ApiError } from "../middleware/errorHandler.js";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const signUpController = catchAsync(async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -107,6 +110,56 @@ export const signInController = async (req, res, next) => {
       data: {
         token,
         user: userResponse,
+      },
+    });
+
+    // console.log(res)
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const signInWithGoogleController = async (req, res, next) => {
+  try {
+    const { idToken } = req.body;
+
+    if (!idToken) {
+      return res.status(400).json({ message: 'No token provided' });
+    }
+
+    // Verify the token
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name } = payload;
+
+    // Check or create user
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({ email, name });
+    }
+
+    // Generate JWT
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '1d' }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Google sign-in successful',
+      data: {
+        token,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+        },
       },
     });
   } catch (error) {
