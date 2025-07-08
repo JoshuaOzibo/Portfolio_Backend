@@ -128,6 +128,10 @@ export const signInWithGoogleController = async (req, res, next) => {
       return res.status(400).json({ message: 'No token provided' });
     }
 
+    // Log server time for debugging token timing issues
+    // const localTime = Math.floor(Date.now() / 1000);
+    // console.log('⏱Server current time (Unix timestamp):', localTime);
+
     // Verify the token
     const ticket = await client.verifyIdToken({
       idToken,
@@ -135,6 +139,10 @@ export const signInWithGoogleController = async (req, res, next) => {
     });
 
     const payload = ticket.getPayload();
+
+    // Log important token timing values
+    // console.log('Token timestamps => nbf:', payload.nbf, 'iat:', payload.iat, 'exp:', payload.exp);
+
     const { email, name } = payload;
 
     // Check or create user
@@ -163,6 +171,8 @@ export const signInWithGoogleController = async (req, res, next) => {
       },
     });
   } catch (error) {
+    // console.error('Google Sign-In Error:', error);
     next(error);
   }
 };
+
